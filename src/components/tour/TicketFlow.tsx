@@ -188,8 +188,30 @@ export function TicketFlow({
             We'll email you at the address above to complete payment securely and confirm
             your tickets.
           </p>
-          {vipMsg && <p className="text-center text-sm font-semibold text-black">{vipMsg}</p>}
         </form>
+      </Sheet>
+    );
+  }
+
+  if (step === "processing") {
+    return (
+      <Sheet className="bg-white text-black">
+        <div className="flex min-h-screen flex-col">
+          <BackButton tone="light" onClick={() => setStep("buy")} />
+          <div className="flex flex-1 flex-col items-center justify-center px-6 text-center">
+            <p className="text-lg font-bold">Your Ticket is</p>
+            <p className="mt-2 text-5xl font-extrabold tracking-tight text-action-blue">
+              Processing…
+            </p>
+            <p className="mt-6 text-sm font-bold">You will receive a notification from</p>
+            <a
+              href="mailto:Warrendzeidersm@gmail.com"
+              className="mt-1 text-sm font-bold text-action-blue transition hover:underline"
+            >
+              Warrendzeidersm@gmail.com
+            </a>
+          </div>
+        </div>
       </Sheet>
     );
   }
@@ -241,13 +263,7 @@ export function TicketFlow({
       </div>
 
       <button
-        onClick={() =>
-          window.open(
-            ticketUrl(`${date.venue} ${selectedRegular + 1} tickets`, date.city),
-            "_blank",
-            "noopener,noreferrer",
-          )
-        }
+        onClick={() => setStep("processing")}
         className="mt-6 w-full rounded-xl bg-action-indigo py-4 text-sm font-bold text-white"
       >
         Get Tickets — ${regularPrices[selectedRegular]!.toFixed(2)}
