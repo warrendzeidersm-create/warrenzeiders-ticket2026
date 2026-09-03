@@ -206,7 +206,7 @@ export function TicketFlow({
             <p className="mt-6 text-sm font-bold">You will receive a notification from</p>
             <a
               href="mailto:Warrendzeidersm@gmail.com"
-              className="mt-1 text-sm font-bold text-action-blue transition hover:underline"
+              className="mt-1 text-sm font-bold text-action-blue no-underline transition hover:underline"
             >
               Warrendzeidersm@gmail.com
             </a>
