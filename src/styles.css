@@ -19,7 +19,29 @@
  */
 
 @theme inline {
+  --font-display: "Bebas Neue", sans-serif;
+  --font-body: Inter, sans-serif;
+  --color-panel: var(--panel);
+  --color-panel-soft: var(--panel-soft);
+  --color-burgundy: var(--burgundy);
+  --color-burgundy-dark: var(--burgundy-dark);
+  --color-line: var(--line);
+  --color-vip: var(--vip);
+  --color-reserved: var(--reserved);
+  --color-standing: var(--standing);
+  --color-stage: var(--stage);
+  --color-seat: var(--seat);
+  --color-sheet-blue: var(--sheet-blue);
+  --color-sheet-light: var(--sheet-light);
+  --color-note-green: var(--note-green);
+  --color-note-yellow: var(--note-yellow);
+  --color-note-blue: var(--note-blue);
+  --color-action-blue: var(--action-blue);
+  --color-action-indigo: var(--action-indigo);
+  --color-action-navy: var(--action-navy);
+  --radius-card: 20px;
   --radius-sm: calc(var(--radius) - 4px);
+
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
