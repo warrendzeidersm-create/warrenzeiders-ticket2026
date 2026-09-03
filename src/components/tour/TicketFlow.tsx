@@ -1,15 +1,9 @@
 import { useEffect, useState } from "react";
 import { ChevronLeft } from "lucide-react";
 import { SeatMapPanel } from "./SeatMap";
-import {
-  regularPrices,
-  regularRows,
-  rowLetters,
-  ticketUrl,
-  type TourDate,
-} from "./data";
+import { regularPrices, regularRows, rowLetters, type TourDate } from "./data";
 
-type Step = "buy" | "vip" | "vip-purchase" | "regular";
+type Step = "buy" | "vip" | "vip-purchase" | "regular" | "processing";
 
 function BackButton({
   onClick,
@@ -68,12 +62,6 @@ export function TicketFlow({
   onClose: () => void;
 }) {
   const [step, setStep] = useState<Step>("buy");
-  const [vipSelection, setVipSelection] = useState<{
-    n: number;
-    price: string;
-    row: string;
-  } | null>(null);
-  const [vipMsg, setVipMsg] = useState<string | null>(null);
   const [selectedRegular, setSelectedRegular] = useState(0);
 
   useEffect(() => {
@@ -134,11 +122,7 @@ export function TicketFlow({
                     <p className="mt-2 font-bold">${price}</p>
                   </div>
                   <button
-                    onClick={() => {
-                      setVipSelection({ n, price, row });
-                      setVipMsg(null);
-                      setStep("vip-purchase");
-                    }}
+                    onClick={() => setStep("vip-purchase")}
                     className="rounded-md bg-action-navy px-4 py-2 text-sm font-semibold text-white"
                   >
                     Buy Now
@@ -172,10 +156,7 @@ export function TicketFlow({
           className="mt-5 flex flex-col gap-4"
           onSubmit={(e) => {
             e.preventDefault();
-            if (!vipSelection) return;
-            setVipMsg(
-              `Request received for ${vipSelection.n} VIP ticket(s), Sec 203 Row ${vipSelection.row} — $${vipSelection.price}. We'll email you to complete payment. (Preview only — wire this up to a real payment/CRM backend in the real build.)`,
-            );
+            setStep("processing");
           }}
         >
           {[
@@ -207,8 +188,30 @@ export function TicketFlow({
             We'll email you at the address above to complete payment securely and confirm
             your tickets.
           </p>
-          {vipMsg && <p className="text-center text-sm font-semibold text-black">{vipMsg}</p>}
         </form>
+      </Sheet>
+    );
+  }
+
+  if (step === "processing") {
+    return (
+      <Sheet className="bg-white text-black">
+        <div className="flex min-h-screen flex-col">
+          <BackButton tone="light" onClick={() => setStep("buy")} />
+          <div className="flex flex-1 flex-col items-center justify-center px-6 text-center">
+            <p className="text-lg font-bold">Your Ticket is</p>
+            <p className="mt-2 text-5xl font-extrabold tracking-tight text-action-blue">
+              Processing…
+            </p>
+            <p className="mt-6 text-sm font-bold">You will receive a notification from</p>
+            <a
+              href="mailto:Warrendzeidersm@gmail.com"
+              className="mt-1 text-sm font-bold text-action-blue no-underline transition hover:underline"
+            >
+              Warrendzeidersm@gmail.com
+            </a>
+          </div>
+        </div>
       </Sheet>
     );
   }
@@ -260,13 +263,7 @@ export function TicketFlow({
       </div>
 
       <button
-        onClick={() =>
-          window.open(
-            ticketUrl(`${date.venue} ${selectedRegular + 1} tickets`, date.city),
-            "_blank",
-            "noopener,noreferrer",
-          )
-        }
+        onClick={() => setStep("processing")}
         className="mt-6 w-full rounded-xl bg-action-indigo py-4 text-sm font-bold text-white"
       >
         Get Tickets — ${regularPrices[selectedRegular]!.toFixed(2)}
