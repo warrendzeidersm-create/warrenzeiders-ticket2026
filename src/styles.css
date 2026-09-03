@@ -19,7 +19,29 @@
  */
 
 @theme inline {
+  --font-display: "Bebas Neue", sans-serif;
+  --font-body: Inter, sans-serif;
+  --color-panel: var(--panel);
+  --color-panel-soft: var(--panel-soft);
+  --color-burgundy: var(--burgundy);
+  --color-burgundy-dark: var(--burgundy-dark);
+  --color-line: var(--line);
+  --color-vip: var(--vip);
+  --color-reserved: var(--reserved);
+  --color-standing: var(--standing);
+  --color-stage: var(--stage);
+  --color-seat: var(--seat);
+  --color-sheet-blue: var(--sheet-blue);
+  --color-sheet-light: var(--sheet-light);
+  --color-note-green: var(--note-green);
+  --color-note-yellow: var(--note-yellow);
+  --color-note-blue: var(--note-blue);
+  --color-action-blue: var(--action-blue);
+  --color-action-indigo: var(--action-indigo);
+  --color-action-navy: var(--action-navy);
+  --radius-card: 20px;
   --radius-sm: calc(var(--radius) - 4px);
+
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
@@ -63,22 +85,45 @@
 
 :root {
   --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.129 0.042 264.695);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.129 0.042 264.695);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.129 0.042 264.695);
-  --primary: oklch(0.208 0.042 265.755);
-  --primary-foreground: oklch(0.984 0.003 247.858);
-  --secondary: oklch(0.968 0.007 247.896);
-  --secondary-foreground: oklch(0.208 0.042 265.755);
-  --muted: oklch(0.968 0.007 247.896);
-  --muted-foreground: oklch(0.554 0.046 257.417);
-  --accent: oklch(0.968 0.007 247.896);
-  --accent-foreground: oklch(0.208 0.042 265.755);
+
+  /* Warren Zeiders — No Brakes tour palette */
+  --panel: oklch(0.18 0 0); /* #111 */
+  --panel-soft: oklch(0.22 0 0); /* #1A1A1A */
+  --burgundy: oklch(0.28 0.13 22); /* #5A0000 */
+  --burgundy-dark: oklch(0.21 0.11 22); /* #3B0000 */
+  --line: rgb(255 255 255 / 0.6);
+  --vip: #d4af37;
+  --reserved: #8b8b8b;
+  --standing: #ffffff;
+  --stage: #0d0d0d;
+  --seat: #1a1a1a;
+  --sheet-blue: #afcbe8;
+  --sheet-light: #f5f5f3;
+  --note-green: #dff7ee;
+  --note-yellow: #f9f9c8;
+  --note-blue: #cfe3f5;
+  --action-blue: #1e1ee0;
+  --action-indigo: #3b3bd6;
+  --action-navy: #173049;
+
+  --background: oklch(0 0 0);
+  --foreground: oklch(1 0 0);
+  --card: var(--panel);
+  --card-foreground: oklch(1 0 0);
+
+  --popover: var(--panel);
+  --popover-foreground: oklch(1 0 0);
+  --primary: oklch(1 0 0);
+  --primary-foreground: oklch(0 0 0);
+  --secondary: var(--panel-soft);
+  --secondary-foreground: oklch(1 0 0);
+  --muted: var(--panel-soft);
+  --muted-foreground: oklch(0.64 0 0);
+  --accent: var(--panel-soft);
+  --accent-foreground: oklch(1 0 0);
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: oklch(0.984 0.003 247.858);
+
   --border: oklch(0.929 0.013 255.508);
   --input: oklch(0.929 0.013 255.508);
   --ring: oklch(0.704 0.04 256.788);
@@ -135,10 +180,43 @@
 @layer base {
   * {
     border-color: var(--color-border);
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  *::-webkit-scrollbar {
+    display: none;
+  }
+
+  html {
+    scroll-behavior: smooth;
   }
 
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
+    font-family: var(--font-body);
   }
 }
+
+@keyframes tourFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@utility fade-up {
+  animation: tourFadeUp 0.8s ease-out both;
+}
+
+@utility stagger {
+  opacity: 0;
+  transform: translateY(18px);
+  animation: tourFadeUp 0.4s ease-out forwards;
+}
+
