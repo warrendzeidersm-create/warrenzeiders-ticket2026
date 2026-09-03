@@ -85,10 +85,32 @@
 
 :root {
   --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.129 0.042 264.695);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.129 0.042 264.695);
+
+  /* Warren Zeiders — No Brakes tour palette */
+  --panel: oklch(0.18 0 0); /* #111 */
+  --panel-soft: oklch(0.22 0 0); /* #1A1A1A */
+  --burgundy: oklch(0.28 0.13 22); /* #5A0000 */
+  --burgundy-dark: oklch(0.21 0.11 22); /* #3B0000 */
+  --line: rgb(255 255 255 / 0.6);
+  --vip: #d4af37;
+  --reserved: #8b8b8b;
+  --standing: #ffffff;
+  --stage: #0d0d0d;
+  --seat: #1a1a1a;
+  --sheet-blue: #afcbe8;
+  --sheet-light: #f5f5f3;
+  --note-green: #dff7ee;
+  --note-yellow: #f9f9c8;
+  --note-blue: #cfe3f5;
+  --action-blue: #1e1ee0;
+  --action-indigo: #3b3bd6;
+  --action-navy: #173049;
+
+  --background: oklch(0 0 0);
+  --foreground: oklch(1 0 0);
+  --card: var(--panel);
+  --card-foreground: oklch(1 0 0);
+
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.129 0.042 264.695);
   --primary: oklch(0.208 0.042 265.755);
