@@ -1,15 +1,9 @@
 import { useEffect, useState } from "react";
 import { ChevronLeft } from "lucide-react";
 import { SeatMapPanel } from "./SeatMap";
-import {
-  regularPrices,
-  regularRows,
-  rowLetters,
-  ticketUrl,
-  type TourDate,
-} from "./data";
+import { regularPrices, regularRows, rowLetters, type TourDate } from "./data";
 
-type Step = "buy" | "vip" | "vip-purchase" | "regular";
+type Step = "buy" | "vip" | "vip-purchase" | "regular" | "processing";
 
 function BackButton({
   onClick,
@@ -68,12 +62,6 @@ export function TicketFlow({
   onClose: () => void;
 }) {
   const [step, setStep] = useState<Step>("buy");
-  const [vipSelection, setVipSelection] = useState<{
-    n: number;
-    price: string;
-    row: string;
-  } | null>(null);
-  const [vipMsg, setVipMsg] = useState<string | null>(null);
   const [selectedRegular, setSelectedRegular] = useState(0);
 
   useEffect(() => {
