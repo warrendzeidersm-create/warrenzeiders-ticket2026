@@ -122,7 +122,7 @@ export function TicketFlow({
         <div className="flex flex-col gap-4">
           {Array.from({ length: 20 }, (_, i) => i + 1).map((n) => {
             const price = (152.99 * n).toFixed(2);
-            const row = rowLetters[n - 1];
+            const row = rowLetters[n - 1]!;
             return (
               <div key={n} className="rounded-2xl bg-white p-4 shadow-sm">
                 <div className="rounded-md bg-action-blue py-2 text-center text-sm font-bold text-white">
@@ -269,7 +269,7 @@ export function TicketFlow({
         }
         className="mt-6 w-full rounded-xl bg-action-indigo py-4 text-sm font-bold text-white"
       >
-        Get Tickets — ${regularPrices[selectedRegular].toFixed(2)}
+        Get Tickets — ${regularPrices[selectedRegular]!.toFixed(2)}
       </button>
       <p className="mt-3 text-center text-[11px] text-black/50">
         You'll finish your purchase securely on our ticketing partner's site.
