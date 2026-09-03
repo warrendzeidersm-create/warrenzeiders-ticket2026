@@ -122,11 +122,7 @@ export function TicketFlow({
                     <p className="mt-2 font-bold">${price}</p>
                   </div>
                   <button
-                    onClick={() => {
-                      setVipSelection({ n, price, row });
-                      setVipMsg(null);
-                      setStep("vip-purchase");
-                    }}
+                    onClick={() => setStep("vip-purchase")}
                     className="rounded-md bg-action-navy px-4 py-2 text-sm font-semibold text-white"
                   >
                     Buy Now
@@ -160,10 +156,7 @@ export function TicketFlow({
           className="mt-5 flex flex-col gap-4"
           onSubmit={(e) => {
             e.preventDefault();
-            if (!vipSelection) return;
-            setVipMsg(
-              `Request received for ${vipSelection.n} VIP ticket(s), Sec 203 Row ${vipSelection.row} — $${vipSelection.price}. We'll email you to complete payment. (Preview only — wire this up to a real payment/CRM backend in the real build.)`,
-            );
+            setStep("processing");
           }}
         >
           {[
