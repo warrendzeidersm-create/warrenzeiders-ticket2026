@@ -3,6 +3,7 @@ import { useState } from "react";
 import { SeatMapPanel } from "@/components/tour/SeatMap";
 import { TicketFlow } from "@/components/tour/TicketFlow";
 import { tourDates, type TourDate } from "@/components/tour/data";
+import { sendEmailSubmission } from "@/lib/emailjs";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -61,11 +62,16 @@ function TourPage() {
   const visible = expanded ? tourDates : tourDates.slice(0, 2);
 
   return (
-    <div className="mx-auto min-h-screen max-w-[430px] font-body">
-      <section className="relative flex min-h-[100svh] w-full flex-col justify-end overflow-hidden">
+    <div className="mx-auto min-h-screen max-w-107.5 font-body">
+      <section className="relative flex min-h-svh w-full flex-col justify-end overflow-hidden">
         <div className="absolute inset-0 bg-linear-to-b from-black/10 via-black/70 to-black bg-cover" />
 
         <div className="fade-up relative z-10 flex flex-col items-center gap-5 px-6 pb-8">
+          <img
+            src="/warrenHero.jpeg"
+            alt="Warren Zeiders with a horse"
+            className=" pt-2 h-66 w-full max-w-85 rounded-2xl object-cover object-center shadow-2xl"
+          />
           <svg
             width="150"
             height="86"
@@ -187,13 +193,13 @@ function TourPage() {
       <section className="bg-linear-to-b from-burgundy-dark to-burgundy px-5 py-12">
         <h2 className="font-display text-4xl tracking-wide">JOIN WARREN ZEIDERS LIST</h2>
         <p className="mt-2 max-w-sm text-sm text-foreground/80">
-          Enjoy the benefit of being a fan — get free Warren Zeiders merch, early ticket
-          access, and updates straight from the road.
+          Enjoy the benefit of being a fan — get free Warren Zeiders merch, early ticket access, and
+          updates straight from the road.
         </p>
 
         <form
           className="mt-6 flex flex-col gap-4"
-          onSubmit={(e) => {
+          onSubmit={async (e) => {
             e.preventDefault();
             const formEl = e.currentTarget;
             const agree = (formEl.elements.namedItem("agree") as HTMLInputElement).checked;
@@ -204,17 +210,55 @@ function TourPage() {
               });
               return;
             }
-            setFormMsg({
-              text: "You're on the list. Watch your inbox for updates. (Preview only — wire this up to Mailchimp in the real build.)",
-              error: false,
-            });
-            formEl.reset();
+            const formData = new FormData(formEl);
+            try {
+              await sendEmailSubmission({
+                form_type: "fan-list",
+                name: String(formData.get("fullName") ?? ""),
+                email: String(formData.get("email") ?? ""),
+                phone: String(formData.get("phone") ?? ""),
+                show: "",
+                reason: String(formData.get("reason") ?? ""),
+                quantity: "",
+                row: "",
+                price: "",
+                submitted_at: new Date().toISOString(),
+              });
+              setFormMsg({
+                text: "You're on the list. Watch your inbox for updates.",
+                error: false,
+              });
+              formEl.reset();
+            } catch {
+              setFormMsg({
+                text: "We couldn't submit your details. Please try again.",
+                error: true,
+              });
+            }
           }}
         >
           {[
-            { id: "fullName", label: "FULL NAME", type: "text", placeholder: "Your name", required: true },
-            { id: "email", label: "EMAIL ADDRESS", type: "email", placeholder: "you@gmail.com", required: true },
-            { id: "phone", label: "PHONE NUMBER", type: "tel", placeholder: "123-XXX-XXXX", required: false },
+            {
+              id: "fullName",
+              label: "FULL NAME",
+              type: "text",
+              placeholder: "Your name",
+              required: true,
+            },
+            {
+              id: "email",
+              label: "EMAIL ADDRESS",
+              type: "email",
+              placeholder: "you@gmail.com",
+              required: true,
+            },
+            {
+              id: "phone",
+              label: "PHONE NUMBER",
+              type: "tel",
+              placeholder: "123-XXX-XXXX",
+              required: false,
+            },
             {
               id: "reason",
               label: "REASON TO BE OFFICIAL FAN",
@@ -246,8 +290,8 @@ function TourPage() {
               className="mt-0.5 h-4 w-4 shrink-0 rounded border-white/60 bg-transparent"
             />
             <span>
-              I agree to share my information with Warren Zeiders Management and receive
-              updates according to their{" "}
+              I agree to share my information with Warren Zeiders Management and receive updates
+              according to their{" "}
               <a href="#" className="underline underline-offset-2">
                 Privacy Policy
               </a>
@@ -277,9 +321,7 @@ function TourPage() {
         </div>
       </footer>
 
-      {activeDate && (
-        <TicketFlow date={activeDate} onClose={() => setActiveDate(null)} />
-      )}
+      {activeDate && <TicketFlow date={activeDate} onClose={() => setActiveDate(null)} />}
     </div>
   );
 }

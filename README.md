@@ -22,3 +22,15 @@ cd <repository-name>
 npm i
 npm run dev
 ```
+
+## EmailJS
+
+Copy `.env.example` to `.env.local`, then fill in the EmailJS service ID, template ID,
+and public key. Restart the dev server after changing environment variables.
+
+The EmailJS template should use these variables:
+`form_type`, `name`, `email`, `phone`, `show`, `reason`, `quantity`, `row`,
+`price`, and `submitted_at`.
+
+These are browser-side EmailJS values. Do not place a private API secret in a
+`VITE_*` variable because Vite exposes those values in the client bundle.

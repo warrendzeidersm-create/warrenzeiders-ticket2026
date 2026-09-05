@@ -2,16 +2,11 @@ import { useEffect, useState } from "react";
 import { ChevronLeft } from "lucide-react";
 import { SeatMapPanel } from "./SeatMap";
 import { regularPrices, regularRows, rowLetters, type TourDate } from "./data";
+import { sendEmailSubmission } from "@/lib/emailjs";
 
 type Step = "buy" | "vip" | "vip-purchase" | "regular" | "processing";
 
-function BackButton({
-  onClick,
-  tone = "dark",
-}: {
-  onClick: () => void;
-  tone?: "dark" | "light";
-}) {
+function BackButton({ onClick, tone = "dark" }: { onClick: () => void; tone?: "dark" | "light" }) {
   return (
     <button
       onClick={onClick}
@@ -47,22 +42,15 @@ const notice = (
   <>
     <div className="mt-4 rounded-lg bg-note-green p-3 text-xs">
       <p className="font-bold">24-HOURS REFUND POLICY IS IN PLACE</p>
-      <p className="mt-1">
-        72 HOURS AFTER PURCHASE IT IS RESPONSIBILITY OF THE TICKET HOLDER
-      </p>
+      <p className="mt-1">72 HOURS AFTER PURCHASE IT IS RESPONSIBILITY OF THE TICKET HOLDER</p>
     </div>
   </>
 );
 
-export function TicketFlow({
-  date,
-  onClose,
-}: {
-  date: TourDate;
-  onClose: () => void;
-}) {
+export function TicketFlow({ date, onClose }: { date: TourDate; onClose: () => void }) {
   const [step, setStep] = useState<Step>("buy");
   const [selectedRegular, setSelectedRegular] = useState(0);
+  const [selectedVip, setSelectedVip] = useState(1);
 
   useEffect(() => {
     document.body.style.overflow = "hidden";
@@ -77,8 +65,7 @@ export function TicketFlow({
         <BackButton onClick={onClose} />
         <h2 className="mb-1 text-lg font-bold tracking-wide">BUY TICKETS</h2>
         <p className="mb-4 text-sm text-muted-foreground">
-          {date.venue} — {date.city}, {date.country} · {date.month} {date.day},{" "}
-          {date.year}
+          {date.venue} — {date.city}, {date.country} · {date.month} {date.day}, {date.year}
         </p>
 
         <SeatMapPanel />
@@ -122,7 +109,10 @@ export function TicketFlow({
                     <p className="mt-2 font-bold">${price}</p>
                   </div>
                   <button
-                    onClick={() => setStep("vip-purchase")}
+                    onClick={() => {
+                      setSelectedVip(n);
+                      setStep("vip-purchase");
+                    }}
                     className="rounded-md bg-action-navy px-4 py-2 text-sm font-semibold text-white"
                   >
                     Buy Now
@@ -154,14 +144,36 @@ export function TicketFlow({
 
         <form
           className="mt-5 flex flex-col gap-4"
-          onSubmit={(e) => {
+          onSubmit={async (e) => {
             e.preventDefault();
-            setStep("processing");
+            const formData = new FormData(e.currentTarget);
+            try {
+              await sendEmailSubmission({
+                form_type: "vip",
+                name: String(formData.get("name") ?? ""),
+                email: String(formData.get("email") ?? ""),
+                phone: String(formData.get("phone") ?? ""),
+                show: `${date.venue}, ${date.city}, ${date.country} - ${date.month} ${date.day}, ${date.year}`,
+                reason: "VIP ticket request",
+                quantity: String(selectedVip),
+                row: rowLetters[selectedVip - 1] ?? "",
+                price: `$${(152.99 * selectedVip).toFixed(2)}`,
+                submitted_at: new Date().toISOString(),
+              });
+              setStep("processing");
+            } catch {
+              window.alert("We couldn't submit your request. Please try again.");
+            }
           }}
         >
           {[
             { id: "vip-fullname", label: "FULL NAME", type: "text", placeholder: "Your name" },
-            { id: "vip-email", label: "EMAIL ADDRESS", type: "email", placeholder: "you@gmail.com" },
+            {
+              id: "vip-email",
+              label: "EMAIL ADDRESS",
+              type: "email",
+              placeholder: "you@gmail.com",
+            },
             { id: "vip-phone", label: "PHONE NUMBER", type: "tel", placeholder: "123-XXX-XXX" },
           ].map((f) => (
             <div key={f.id} className="flex flex-col gap-1.5">
@@ -170,6 +182,7 @@ export function TicketFlow({
               </label>
               <input
                 id={f.id}
+                name={f.id === "vip-fullname" ? "name" : f.id.replace("vip-", "")}
                 required
                 type={f.type}
                 placeholder={f.placeholder}
@@ -185,8 +198,8 @@ export function TicketFlow({
             Pay
           </button>
           <p className="text-center text-[11px] text-black/50">
-            We'll email you at the address above to complete payment securely and confirm
-            your tickets.
+            We'll email you at the address above to complete payment securely and confirm your
+            tickets.
           </p>
         </form>
       </Sheet>
@@ -238,39 +251,87 @@ export function TicketFlow({
         Delivery of Tickets: Prints@Home/ Mobile- FREE
       </div>
 
-      <h3 className="mt-5 mb-2 text-sm font-bold">Select a Ticket</h3>
-      <div className="flex flex-col gap-2.5">
-        {regularPrices.map((price, i) => (
-          <label
-            key={i}
-            className="flex cursor-pointer items-center justify-between rounded-lg border border-black/15 bg-white px-4 py-3 text-sm"
-          >
-            <span>
-              {i + 1} Ticket- Sec 203 Row {regularRows[i]}
-            </span>
-            <span className="flex items-center gap-3">
-              <span className="font-bold">${price.toFixed(2)}</span>
-              <input
-                type="radio"
-                name="regular-ticket"
-                className="h-4 w-4"
-                checked={selectedRegular === i}
-                onChange={() => setSelectedRegular(i)}
-              />
-            </span>
-          </label>
-        ))}
-      </div>
-
-      <button
-        onClick={() => setStep("processing")}
-        className="mt-6 w-full rounded-xl bg-action-indigo py-4 text-sm font-bold text-white"
+      <form
+        className="mt-5"
+        onSubmit={async (e) => {
+          e.preventDefault();
+          const formData = new FormData(e.currentTarget);
+          try {
+            await sendEmailSubmission({
+              form_type: "regular",
+              name: String(formData.get("name") ?? ""),
+              email: String(formData.get("email") ?? ""),
+              phone: String(formData.get("phone") ?? ""),
+              show: `${date.venue}, ${date.city}, ${date.country} - ${date.month} ${date.day}, ${date.year}`,
+              reason: "Regular ticket request",
+              quantity: String(selectedRegular + 1),
+              row: regularRows[selectedRegular] ?? "",
+              price: `$${regularPrices[selectedRegular]!.toFixed(2)}`,
+              submitted_at: new Date().toISOString(),
+            });
+            setStep("processing");
+          } catch {
+            window.alert("We couldn't submit your request. Please try again.");
+          }
+        }}
       >
-        Get Tickets — ${regularPrices[selectedRegular]!.toFixed(2)}
-      </button>
-      <p className="mt-3 text-center text-[11px] text-black/50">
-        You'll finish your purchase securely on our ticketing partner's site.
-      </p>
+        <div className="flex flex-col gap-3">
+          <input
+            name="name"
+            required
+            placeholder="Full name"
+            className="rounded-lg border border-black/20 bg-white px-4 py-3 text-sm"
+          />
+          <input
+            name="email"
+            required
+            type="email"
+            placeholder="Email address"
+            className="rounded-lg border border-black/20 bg-white px-4 py-3 text-sm"
+          />
+          <input
+            name="phone"
+            required
+            type="tel"
+            placeholder="Phone number"
+            className="rounded-lg border border-black/20 bg-white px-4 py-3 text-sm"
+          />
+        </div>
+
+        <h3 className="mt-5 mb-2 text-sm font-bold">Select a Ticket</h3>
+        <div className="flex flex-col gap-2.5">
+          {regularPrices.map((price, i) => (
+            <label
+              key={i}
+              className="flex cursor-pointer items-center justify-between rounded-lg border border-black/15 bg-white px-4 py-3 text-sm"
+            >
+              <span>
+                {i + 1} Ticket- Sec 203 Row {regularRows[i]}
+              </span>
+              <span className="flex items-center gap-3">
+                <span className="font-bold">${price.toFixed(2)}</span>
+                <input
+                  type="radio"
+                  name="regular-ticket"
+                  className="h-4 w-4"
+                  checked={selectedRegular === i}
+                  onChange={() => setSelectedRegular(i)}
+                />
+              </span>
+            </label>
+          ))}
+        </div>
+
+        <button
+          type="submit"
+          className="mt-6 w-full rounded-xl bg-action-indigo py-4 text-sm font-bold text-white"
+        >
+          Get Tickets — ${regularPrices[selectedRegular]!.toFixed(2)}
+        </button>
+        <p className="mt-3 text-center text-[11px] text-black/50">
+          You'll finish your purchase securely on our ticketing partner's site.
+        </p>
+      </form>
     </Sheet>
   );
 }
